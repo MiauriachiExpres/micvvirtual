@@ -371,68 +371,68 @@ const textoCuadro2 = `
 let objetoInteractuable = null;
 
 // Actualizar función animate para incluir cuadros
-function animate() {
-  requestAnimationFrame(animate);
+// function animate() {
+//   requestAnimationFrame(animate);
 
-  if (controls.isLocked) {
-    direction.z = Number(move.forward) - Number(move.backward);
-    direction.x = Number(move.right) - Number(move.left);
-    direction.normalize();
+//   if (controls.isLocked) {
+//     direction.z = Number(move.forward) - Number(move.backward);
+//     direction.x = Number(move.right) - Number(move.left);
+//     direction.normalize();
 
-    const speed = 0.03;
-    if (move.forward || move.backward) velocity.z = direction.z * speed;
-    if (move.left || move.right) velocity.x = direction.x * speed;
+//     const speed = 0.03;
+//     if (move.forward || move.backward) velocity.z = direction.z * speed;
+//     if (move.left || move.right) velocity.x = direction.x * speed;
 
-    controls.moveRight(velocity.x);
-    controls.moveForward(velocity.z);
+//     controls.moveRight(velocity.x);
+//     controls.moveForward(velocity.z);
 
-    if (move.forward || move.backward || move.left || move.right) {
-      camera.position.y = 1.6 + Math.sin(Date.now() * 0.015) * 0.05;
-    } else {
-      camera.position.y = 1.6;
-    }
+//     if (move.forward || move.backward || move.left || move.right) {
+//       camera.position.y = 1.6 + Math.sin(Date.now() * 0.015) * 0.05;
+//     } else {
+//       camera.position.y = 1.6;
+//     }
 
-    velocity.x *= 0.7;
-    velocity.z *= 0.7;
-  }
+//     velocity.x *= 0.7;
+//     velocity.z *= 0.7;
+//   }
 
-  linterna.position.set(camera.position.x, camera.position.y, camera.position.z);
-  linterna.target.position.set(
-    camera.position.x + camera.getWorldDirection(new THREE.Vector3()).x,
-    camera.position.y + camera.getWorldDirection(new THREE.Vector3()).y,
-    camera.position.z + camera.getWorldDirection(new THREE.Vector3()).z
-  );
+//   linterna.position.set(camera.position.x, camera.position.y, camera.position.z);
+//   linterna.target.position.set(
+//     camera.position.x + camera.getWorldDirection(new THREE.Vector3()).x,
+//     camera.position.y + camera.getWorldDirection(new THREE.Vector3()).y,
+//     camera.position.z + camera.getWorldDirection(new THREE.Vector3()).z
+//   );
 
-  const distanciaMinima = 1.2;
+//   const distanciaMinima = 1.2;
 
-  // Distancias para papel y cuadros
-  const distanciaAlPapel = camera.position.distanceTo(papel.position);
-  const distanciaAlCuadro1 = camera.position.distanceTo(cuadro1.position);
-  const distanciaAlCuadro2 = camera.position.distanceTo(cuadro2.position);
+//   // Distancias para papel y cuadros
+//   const distanciaAlPapel = camera.position.distanceTo(papel.position);
+//   const distanciaAlCuadro1 = camera.position.distanceTo(cuadro1.position);
+//   const distanciaAlCuadro2 = camera.position.distanceTo(cuadro2.position);
 
-  // Mostrar mensaje de interacción solo si está cerca de alguno y no hay popup abierto
-  if (popup.style.display === 'none') {
-    if (distanciaAlPapel < distanciaMinima) {
-      interactMsg.style.display = 'block';
-      objetoInteractuable = 'papel';
-    } else if (distanciaAlCuadro1 < distanciaMinima) {
-      interactMsg.style.display = 'block';
-      objetoInteractuable = 'cuadro1';
-    } else if (distanciaAlCuadro2 < distanciaMinima) {
-      interactMsg.style.display = 'block';
-      objetoInteractuable = 'cuadro2';
-    } else {
-      interactMsg.style.display = 'none';
-      objetoInteractuable = null;
-    }
-  } else {
-    interactMsg.style.display = 'none';
-  }
+//   // Mostrar mensaje de interacción solo si está cerca de alguno y no hay popup abierto
+//   if (popup.style.display === 'none') {
+//     if (distanciaAlPapel < distanciaMinima) {
+//       interactMsg.style.display = 'block';
+//       objetoInteractuable = 'papel';
+//     } else if (distanciaAlCuadro1 < distanciaMinima) {
+//       interactMsg.style.display = 'block';
+//       objetoInteractuable = 'cuadro1';
+//     } else if (distanciaAlCuadro2 < distanciaMinima) {
+//       interactMsg.style.display = 'block';
+//       objetoInteractuable = 'cuadro2';
+//     } else {
+//       interactMsg.style.display = 'none';
+//       objetoInteractuable = null;
+//     }
+//   } else {
+//     interactMsg.style.display = 'none';
+//   }
 
-  renderer.render(scene, camera);
-}
+//   renderer.render(scene, camera);
+// }
 
-animate();
+// animate();
 
 // Modificar evento para abrir popup según el objeto
 document.addEventListener('keydown', (event) => {
@@ -509,3 +509,166 @@ escalerasGrupo.position.set(
 escalerasGrupo.rotation.y = 4 * Math.PI/2 ;
 
 scene.add(escalerasGrupo);
+
+
+// --- CONTROLES PARA MÓVILES ---
+// Variables para el joystick
+let joystickForward = 0;
+let joystickRight = 0;
+
+const joystickContainer = document.getElementById('joystick-container');
+const interactButton = document.getElementById('interact-button');
+
+// Inicializar nipplejs
+const joystick = nipplejs.create({
+  zone: joystickContainer,
+  mode: 'static',
+  position: { left: '75px', top: '75px' },
+  color: 'gray',
+  size: 120,
+  restOpacity: 0.6,
+});
+
+// Escuchar eventos del joystick
+joystick.on('move', (evt, data) => {
+  if (data && data.vector) {
+    // data.vector.x es horizontal (-1 a 1), data.vector.y es vertical (-1 a 1)
+    joystickRight = data.vector.x;
+    joystickForward = -data.vector.y; // invertido porque y negativo es hacia adelante
+  }
+});
+
+joystick.on('end', () => {
+  joystickForward = 0;
+  joystickRight = 0;
+});
+
+// Control táctil para rotar cámara (touchmove)
+let lastTouchX = null;
+let lastTouchY = null;
+
+function onTouchStart(event) {
+  if (event.touches.length === 1) {
+    lastTouchX = event.touches[0].clientX;
+    lastTouchY = event.touches[0].clientY;
+  }
+}
+
+function onTouchMove(event) {
+  if (!controls.isLocked) return; // solo si el control está bloqueado (jugando)
+
+  if (event.touches.length === 1) {
+    const touch = event.touches[0];
+    const movementX = touch.clientX - lastTouchX;
+    const movementY = touch.clientY - lastTouchY;
+
+    controls.getObject().rotation.y -= movementX * 0.002; // ajustar sensibilidad
+    camera.rotation.x -= movementY * 0.002;
+    camera.rotation.x = Math.max(-Math.PI / 2, Math.min(Math.PI / 2, camera.rotation.x));
+
+    lastTouchX = touch.clientX;
+    lastTouchY = touch.clientY;
+  }
+}
+
+window.addEventListener('touchstart', onTouchStart, { passive: false });
+window.addEventListener('touchmove', onTouchMove, { passive: false });
+
+// Botón interactuar
+interactButton.addEventListener('click', () => {
+  const distanciaMinima = 1.2;
+  const distanciaAlPapel = camera.position.distanceTo(papel.position);
+  if (distanciaAlPapel < distanciaMinima) {
+    popupText.innerHTML = textoDeBienvenida;
+    popup.style.display = 'block';
+    controls.unlock();
+  }
+});
+
+// Ejemplo muy básico de joystick:  
+// Asumo que tienes un objeto joystick con propiedades x, y (-1 a 1)
+// donde y > 0 es adelante, y < 0 atrás, x > 0 derecha, x < 0 izquierda.
+// Si no tienes joystick, estos valores serán 0.
+
+// Aquí la función para actualizar move desde joystick:
+function actualizarMovimientoDesdeJoystick() {
+  if (joystick) {
+    // Ajusta la sensibilidad si quieres:
+    const threshold = 0.1;
+
+    move.forward = joystick.y > threshold;
+    move.backward = joystick.y < -threshold;
+    move.right = joystick.x > threshold;
+    move.left = joystick.x < -threshold;
+  }
+}
+
+// Detectar si es móvil o tablet
+const esMovil = /Android|iPhone|iPad|iPod|Opera Mini|IEMobile|WPDesktop/i.test(navigator.userAgent);
+
+// Tu función animate respetando todo, sólo añadiendo la llamada:
+function animate() {
+  requestAnimationFrame(animate);
+
+  // actualizarMovimientoDesdeJoystick();
+
+    if (esMovil) {
+    actualizarMovimientoDesdeJoystick();
+  }
+  if (controls.isLocked) {
+    direction.z = Number(move.forward) - Number(move.backward);
+    direction.x = Number(move.right) - Number(move.left);
+    direction.normalize();
+
+    const speed = 0.03;
+    if (move.forward || move.backward) velocity.z = direction.z * speed;
+    if (move.left || move.right) velocity.x = direction.x * speed;
+
+    controls.moveRight(velocity.x);
+    controls.moveForward(velocity.z);
+
+    if (move.forward || move.backward || move.left || move.right) {
+      camera.position.y = 1.6 + Math.sin(Date.now() * 0.015) * 0.05;
+    } else {
+      camera.position.y = 1.6;
+    }
+
+    velocity.x *= 0.7;
+    velocity.z *= 0.7;
+  }
+
+  linterna.position.set(camera.position.x, camera.position.y, camera.position.z);
+  linterna.target.position.set(
+    camera.position.x + camera.getWorldDirection(new THREE.Vector3()).x,
+    camera.position.y + camera.getWorldDirection(new THREE.Vector3()).y,
+    camera.position.z + camera.getWorldDirection(new THREE.Vector3()).z
+  );
+
+  const distanciaMinima = 1.2;
+
+  const distanciaAlPapel = camera.position.distanceTo(papel.position);
+  const distanciaAlCuadro1 = camera.position.distanceTo(cuadro1.position);
+  const distanciaAlCuadro2 = camera.position.distanceTo(cuadro2.position);
+
+  if (popup.style.display === 'none') {
+    if (distanciaAlPapel < distanciaMinima) {
+      interactMsg.style.display = 'block';
+      objetoInteractuable = 'papel';
+    } else if (distanciaAlCuadro1 < distanciaMinima) {
+      interactMsg.style.display = 'block';
+      objetoInteractuable = 'cuadro1';
+    } else if (distanciaAlCuadro2 < distanciaMinima) {
+      interactMsg.style.display = 'block';
+      objetoInteractuable = 'cuadro2';
+    } else {
+      interactMsg.style.display = 'none';
+      objetoInteractuable = null;
+    }
+  } else {
+    interactMsg.style.display = 'none';
+  }
+
+  renderer.render(scene, camera);
+}
+
+animate();
