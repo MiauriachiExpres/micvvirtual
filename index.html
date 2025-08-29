@@ -4,6 +4,8 @@
   <meta charset="UTF-8">
   <title>Mi CV en 3D</title>
   <link rel="stylesheet" href="style.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/nipplejs/0.9.0/nipplejs.min.js"></script>
+
 </head>
 <body>
   <canvas id="cv-canvas"></canvas>
@@ -65,6 +67,8 @@
   <div id="popup-text" style="max-width: 800px; margin: auto; line-height: 1.6;"></div>
 </div>
 
+<div id="joystick-container" style="position: fixed; bottom: 20px; left: 20px; width: 150px; height: 150px; touch-action: none; z-index: 10;"></div>
+<button id="interact-button" style="position: fixed; bottom: 30px; right: 30px; width: 60px; height: 60px; font-size: 18px; z-index: 10;">X</button>
 
   <script type="module" src="main.js"></script>
   
