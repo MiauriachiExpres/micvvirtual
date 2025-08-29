@@ -24,6 +24,12 @@ document.body.addEventListener('click', () => {
   controls.lock();
 });
 
+document.body.addEventListener('touchstart', () => {
+  if (!controls.isLocked) {
+    controls.lock();
+  }
+});
+
 scene.add(controls.getObject());
 
 const velocity = new THREE.Vector3();
@@ -674,3 +680,4 @@ function animate() {
 }
 
 animate();
+
