@@ -531,17 +531,19 @@ const joystick = nipplejs.create({
 
 // Escuchar eventos del joystick
 joystick.on('move', (evt, data) => {
-  if (data && data.vector) {
-    // data.vector.x es horizontal (-1 a 1), data.vector.y es vertical (-1 a 1)
-    joystickRight = data.vector.x;
-    joystickForward = -data.vector.y; // invertido porque y negativo es hacia adelante
-  }
+  const { x, y } = data.vector; // van de -1 a 1
+
+  const threshold = 0.1;
+  move.forward = y < -threshold;
+  move.backward = y > threshold;
+  move.right = x > threshold;
+  move.left = x < -threshold;
 });
 
 joystick.on('end', () => {
-  joystickForward = 0;
-  joystickRight = 0;
+  move.forward = move.backward = move.left = move.right = false;
 });
+
 
 // Control táctil para rotar cámara (touchmove)
 let lastTouchX = null;
