@@ -7,6 +7,66 @@
 </head>
 <body>
   <canvas id="cv-canvas"></canvas>
+  <div id="controls-popup">
+  <h3>Controles</h3>
+  <p>W - Avanzar</p>
+  <p>S - Retroceder</p>
+  <p>A - Izquierda</p>
+  <p>D - Derecha</p>
+  <p>Click - Activar cámara</p>
+</div>
+<!-- Mensaje para interactuar -->
+<div id="interactMsg" style="
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0,0,0,0.7);
+  color: white;
+  padding: 10px 20px;
+  font-family: Arial, sans-serif;
+  font-size: 16px;
+  border-radius: 5px;
+  display: none;
+  z-index: 1000;
+  user-select: none;
+">
+  Presiona X para interactuar
+</div>
+
+<!-- Popup fullscreen -->
+<div id="popup" style="
+  display: none;
+  position: fixed;
+  top: 0; left: 0;
+  width: 100vw; height: 100vh;
+  background-color: rgba(0, 0, 0, 0.9);
+  color: #eee;
+  font-family: 'Georgia', serif;
+  font-size: 20px;
+  padding: 60px 40px 40px 40px;
+  box-sizing: border-box;
+  overflow-y: auto;
+  z-index: 10000;
+">
+  <button id="popup-close" aria-label="Cerrar popup" style="
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    background: none;
+    border: none;
+    color: #eee;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+    font-family: Arial, sans-serif;
+    user-select: none;
+  ">&times;</button>
+  <div id="popup-text" style="max-width: 800px; margin: auto; line-height: 1.6;"></div>
+</div>
+
+
   <script type="module" src="main.js"></script>
+  
 </body>
 </html>
